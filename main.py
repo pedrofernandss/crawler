@@ -65,3 +65,17 @@ while PATHS:
             if href not in VISITED_PATHS and href not in PATHS:   
                 PATHS.append(href)
 
+with open("report.md", "w", encoding="utf-8") as report:
+    report.write("```mermaid\n")
+    report.write("graph TD\n")
+
+    for origin, destination in GRAPH_REPORT:
+        
+        id_origin = "Home" if origin == "" else origin
+        id_destination = "Home" if destination == "" else destination
+
+        report.write(f"    {id_origin} --> {id_destination}\n")
+    
+    report.write("```\n")
+
+print("💾 Arquivo grafo.md gerado com sucesso!")
