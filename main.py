@@ -12,7 +12,7 @@ while PATHS:
     
     path = PATHS.pop(0)
 
-    print(f"\n🔗 Visitando: http://{HOST}:{PORT}/{path}")
+    # print(f"\n🔗 Visitando: http://{HOST}:{PORT}/{path}")
     request = f"GET /{path} HTTP/1.1\r\nConnection: close\r\nHost: localhost\r\n\r\n"
     
     VISITED_PATHS.add(path)
@@ -30,6 +30,12 @@ while PATHS:
             response += data
 
     html_content = response.decode('utf-8', errors='ignore')
+    html_content_list = html_content.splitlines()
+    
+    header = html_content_list[0]
+    header_splited = header.split()
+    status_code = header_splited[1]
+
     soup = BeautifulSoup(html_content, 'html.parser')
 
     for link in soup.find_all('a'):
