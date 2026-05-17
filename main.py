@@ -6,8 +6,15 @@ PORT = 8080
 PATHS = [""]
 VISITED_PATHS = set()
 GRAPH_REPORT = set()
+STATUS_REPORT = {}
 
-print("🕷️ Iniciando o Crawler...")
+STATUS_LIST = {
+    "200": "OK - A requisição foi bem-sucedida e a página foi carregada.",
+    "301": "Moved Permanently - A página foi movida permanentemente para outro endereço.",
+    "404": "Not Found - A página não foi encontrada no servidor.",
+    "500": "Internal Server Error - O servidor encontrou um erro interno.",
+    "501": "Not Implemented - O servidor não suporta a funcionalidade requerida."
+}
 
 while PATHS:
     
@@ -37,6 +44,8 @@ while PATHS:
     header_splited = header.split()
     status_code = header_splited[1]
 
+    STATUS_REPORT[path] = status_code
+
     if status_code == "301":
         for content in html_content_list:
             if content.startswith("Location:"):
@@ -65,7 +74,15 @@ while PATHS:
             if href not in VISITED_PATHS and href not in PATHS:   
                 PATHS.append(href)
 
-with open("report.md", "w", encoding="utf-8") as report:
+with open("relatorio.txt", "w", encoding="utf-8") as f_txt:
+    f_txt.write("RELATÓRIO DE PÁGINAS VISITADAS\n\n")
+    for url, status in STATUS_REPORT.items():
+        url_formatada = "/" if url == "" else f"/{url}"
+        descricao = STATUS_LIST.get(status, "Código de status desconhecido.")
+        f_txt.write(f"URL: {url_formatada} | Status: {status} - {descricao}\n")
+
+
+with open("graph.md", "w", encoding="utf-8") as report:
     report.write("```mermaid\n")
     report.write("graph TD\n")
 
@@ -77,5 +94,3 @@ with open("report.md", "w", encoding="utf-8") as report:
         report.write(f"    {id_origin} --> {id_destination}\n")
     
     report.write("```\n")
-
-print("💾 Arquivo grafo.md gerado com sucesso!")
